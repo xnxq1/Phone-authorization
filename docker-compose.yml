@@ -32,3 +32,22 @@ services:
       POSTGRES_PASSWORD: db_pass
       POSTGRES_USER: db_user
       POSTGRES_DB: db_app
+
+  redis:
+    image: redis:6.0-alpine
+    restart: always
+    hostname: redis
+
+
+  worker:
+    build:
+      context: .
+    hostname: worker
+    entrypoint: celery
+    command: -A celery_app.app worker --loglevel=info
+    volumes:
+      - ./app:/app
+    links:
+      - redis
+    depends_on:
+      - redis
