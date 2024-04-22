@@ -65,6 +65,6 @@ class Register(View):
 
                 login(request, user)
 
-            return HttpResponse('Вы зарегистрировались, ваш реферральный токен: referral_token')
+            return HttpResponse(f'Вы зарегистрировались, ваш реферральный токен: {referral_token}')
 
         return HttpResponse('Что-то пошло не так')
