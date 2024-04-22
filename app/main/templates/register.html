@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="form_auth_block">
+  <div class="form_auth_block_content">
+    <p class="form_auth_block_head_text">Регистрация</p>
+    <form class="form_auth_style" action="{% url 'main:register' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit"> Регистрация</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>
