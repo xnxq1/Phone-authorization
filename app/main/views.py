@@ -9,7 +9,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from .forms import LoginForm, RegisterForm
-from .tasks import create_referral_token
+from .tasks import create_referral_token,add_referral_user
 
 # Create your views here.
 def check_auth(request):
@@ -61,10 +61,10 @@ class Register(View):
                 user = form.save(commit=False)
                 user.set_password(form.cleaned_data['password1'])
                 user.save()
-                referral_token = create_referral_token(user)
-
+                user_referral_token = create_referral_token(user)
                 login(request, user)
+                authorization_referral_token = add_referral_user(self.request.POST.get('referral_token'), user)
 
-            return HttpResponse(f'Вы зарегистрировались, ваш реферральный токен: {referral_token}')
+            return HttpResponse(f'Вы зарегистрировались под токеном {authorization_referral_token}, ваш реферральный токен: {user_referral_token}')
 
         return HttpResponse('Что-то пошло не так')
