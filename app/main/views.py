@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
+from django.db import transaction
 from django.forms import forms
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -8,7 +9,7 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from .forms import LoginForm, RegisterForm
-
+from .tasks import create_referral_token
 
 # Create your views here.
 def check_auth(request):
@@ -56,14 +57,14 @@ class Register(View):
     def post(self, request):
         form = RegisterForm(request.POST)
         if form.is_valid():
+            with transaction.atomic():
+                user = form.save(commit=False)
+                user.set_password(form.cleaned_data['password1'])
+                user.save()
+                referral_token = create_referral_token(user)
 
-            user = form.save(commit=False)
+                login(request, user)
 
-            user.set_password(form.cleaned_data['password1'])
-            user.save()
-
-            login(request, user)
-
-            return HttpResponse('Вы зарегистрировались')
+            return HttpResponse('Вы зарегистрировались, ваш реферральный токен: referral_token')
 
         return HttpResponse('Что-то пошло не так')
