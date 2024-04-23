@@ -11,9 +11,6 @@ from rest_framework.response import Response
 
 
 class apiViewSet(viewsets.ViewSet):
-    """
-    A simple ViewSet for listing or retrieving users.
-    """
 
     def retrieve(self, request, pk=None):
         referral = ReferralProgram.objects.get(user_owner__id=pk)

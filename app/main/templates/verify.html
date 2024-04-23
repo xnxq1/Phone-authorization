@@ -8,13 +8,14 @@
 <body>
     <div class="form_auth_block">
   <div class="form_auth_block_content">
-    <p class="form_auth_block_head_text">Регистрация</p>
-    <form class="form_auth_style" action="{% url 'main:register' %}" method="post">
+    <p class="form_auth_block_head_text">Верификация</p>
+    <form class="form_auth_style" action="{% url 'main:verify' %}" method="post">
         {% csrf_token %}
         {% for el in form %}
             {{ el.label }}<p>{{ el }}</p>
         {% endfor %}
-        <button type="submit"> Регистрация</button>
+       <button class="btn" id="get_pin_button" type="button"><i class="icon-share"></i> Get PIN</button>
+        <button type="submit"> Верификация</button>
     </form>
   </div>
 </div>

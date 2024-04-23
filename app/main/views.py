@@ -1,15 +1,14 @@
+import random
+
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.hashers import make_password
 from django.db import transaction
-from django.forms import forms
 from django.http import HttpResponse
 from django.shortcuts import render
-
 from django.views import View
-from django.views.generic import TemplateView
-
-from .forms import LoginForm, RegisterForm
-from .tasks import create_referral_token,add_referral_user
+from .forms import LoginForm, RegisterForm, VerifyForm
+from .tasks import create_referral_token,add_referral_user, send_pin
+from django.contrib import messages
+from django.shortcuts import redirect
 
 # Create your views here.
 def check_auth(request):
@@ -46,12 +45,12 @@ class Logout(View):
         logout(request)
         return HttpResponse('Вы вышли из аккаунта')
 
+
 class Register(View):
 
     def get(self, request):
         if check_auth(request):
             return HttpResponse('Вы авторизованы')
-
         return render(request, 'register.html', {'form': RegisterForm()})
 
     def post(self, request):
@@ -59,12 +58,25 @@ class Register(View):
         if form.is_valid():
             with transaction.atomic():
                 user = form.save(commit=False)
-                user.set_password(form.cleaned_data['password1'])
-                user.save()
-                user_referral_token = create_referral_token(user)
-                login(request, user)
-                authorization_referral_token = add_referral_user(self.request.POST.get('referral_token'), user)
+                request['user'] = user
+                #user.set_password(form.cleaned_data['password1'])
+                #user.save()
+                request['user_referral_token'] = create_referral_token(user)
+                request['authorization_referral_token'] = add_referral_user(self.request.POST.get('referral_token'), user)
 
-            return HttpResponse(f'Вы зарегистрировались под токеном {authorization_referral_token}, ваш реферральный токен: {user_referral_token}')
+            return redirect(to='main:verify')
 
         return HttpResponse('Что-то пошло не так')
+
+
+
+class Verify(View):
+
+    def get(self, request):
+        phone = request.GET.get('user')
+        send_pin(phone)
+        return render(request, 'verify.html', {'form': VerifyForm()})
+
+
+
+

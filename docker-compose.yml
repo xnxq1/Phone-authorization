@@ -39,7 +39,20 @@ services:
     hostname: redis
 
 
-  worker:
+  worker1:
+    build:
+      context: .
+    hostname: worker
+    entrypoint: celery
+    command: -A celery_app.app worker --loglevel=info
+    volumes:
+      - ./app:/app
+    links:
+      - redis
+    depends_on:
+      - redis
+
+  worker2:
     build:
       context: .
     hostname: worker

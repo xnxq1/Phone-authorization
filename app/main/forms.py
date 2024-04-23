@@ -62,3 +62,11 @@ class RegisterForm(forms.ModelForm):
                 raise ValidationError("Нет такого токена")
 
         return referral_token
+
+
+
+class VerifyForm(forms.Form):
+    pin_token = forms.CharField(max_length=6,
+                                label='PIN-код',
+                                widget=forms.TextInput(attrs={'placeholder': '123456'}),)
+
